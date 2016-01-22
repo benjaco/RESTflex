@@ -1,8 +1,8 @@
 /**
- * Created by Bejamco on 12-01-2016.
+ * Created by Benjaco on 12-01-2016.
  */
 
-function REST_variable(url, options){
+function REST_variable(url, options, func){
     this.data = false;
     this.url = url;
     var loaded = false;
@@ -11,23 +11,27 @@ function REST_variable(url, options){
     options = (typeof options !== "undefined" ? options : {});
 
     this.options = REST_helpers.option(options, {
-        "readOnCreated": true,
-        "successGetHeader": 200,
-        "successPostHeader": 201,
-        "successDeleteHeader": 204,
-        "successPutHeader": 200,
+        "readOnCreated": REST.defaults.readOnCreated,
+        "successGetHeader": REST.defaults.successGetHeader,
+        "successPostHeader": REST.defaults.successPostHeader,
+        "successDeleteHeader": REST.defaults.successDeleteHeader,
+        "successPutHeader": REST.defaults.successPutHeader,
+        "converter": REST.defaults.variable_converter,
         "name": url,
-        "get": function(){
+        "get": function(func){
             REST_ajax.get(url, function(data){
-                object.data = data;
+                object.data = object.options.converter(data);
                 if(!loaded) {
                     loaded=true;
-                    REST_notifyer.emitLoaded(object.options.name);
+                    if(typeof func == "function" ){
+                        func(object.data);
+                    }
+                    REST_notifyer.emitLoaded(object.options.name, object.data);
                 }else {
-                    REST_notifyer.emitUpdate(object.options.name);
+                    REST_notifyer.emitUpdate(object.options.name, object.data);
                 }
             }, object.options.successGetHeader, function(x){
-                object.options.getError();
+                object.options.getError(x);
             })
         },
         "delete": function(){
@@ -36,10 +40,14 @@ function REST_variable(url, options){
         "add": function(){
             console.error("Simple variables cant be deleted or added by default");
         },
-        "update": function(data){
+        "update": function(data, func){
             REST_ajax.put(url, function(Rdata){
                 object.data = data;
-                REST_notifyer.emitUpdate(object.options.name);
+
+                if(typeof func == "function" ){
+                    func(data);
+                }
+                REST_notifyer.emitUpdate(object.options.name, data);
             }, {data:data}, object.options.successPutHeader, function (x) {
                 object.options.updateError(x)
             })
@@ -62,20 +70,45 @@ function REST_variable(url, options){
         }
     });
 
-    this.get = function(){
-        this.options.get()
+    this.get = function(func){
+        this.options.get(func)
     };
     this.delete = function(){
         this.options.delete()
     };
-    this.update = function(data){
-        this.options.update(data)
+    this.update = function(data, func){
+        this.options.update(data, func)
     };
     this.add = function(data){
         this.options.add(data)
     };
+
+    this.onLoaded = function(func){
+        REST_notifyer.onLoaded(options.name, func);
+    };
+    this.onUpdate = function(func){
+        REST_notifyer.onUpdate(options.name, func);
+    };
+    this.onAdd = function(func){
+        REST_notifyer.onAdd(options.name, func);
+    };
+    this.onDelete = function(func){
+        REST_notifyer.onDelete(options.name, func);
+    };
+
+    this.REST_variable = function (subUrl, options, func) {
+        return new REST_variable(this.url + "/" + subUrl, REST_helpers.option(options, {
+            "name": this.options.name + "/" + url
+        }), func)
+    };
+    this.REST_list = function (subUrl, options, func) {
+        return new REST_list(this.url + subUrl, REST_helpers.option(options, {
+            "name": this.options.name + "/" + url
+        }), func)
+    };
+
     if(this.options.readOnCreated) {
-        this.options.get()
+        this.options.get(func)
     }
 
 }

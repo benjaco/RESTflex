@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../requirements/bower_components/jquery/dist/jquery.js"></script>
+    <script src="../../dist/restflex.min.js"></script>
+
+
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            background: #f0f0f0;
+        }
+
+        .diskotionouter{
+            width: 700px;
+            margin: 100px auto;
+        }
+        .diskotion{
+            box-shadow: 0 -1px 0 #e5e5e5,0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.24);
+            position: relative;
+            right: 0;
+            width: 700px;
+
+
+            transition: all .2s;
+        }
+        .diskotion>div{
+            background: #ffffff;
+        }
+        .diskotion.out{
+            margin: 10px 0;
+            width: 740px;
+            position: relative;
+            right: 20px;
+            box-shadow: 0 0 6px rgba(0,0,0,.16),0 6px 12px rgba(0,0,0,.32);
+        }
+
+
+
+        /*ny diskotion*/
+        input{
+            font-size: 1.2em;
+        font-weight: bold;
+        display: block;
+        padding: 10px;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+        width: 100%;
+        }
+        textarea{
+            font-size: 1em;
+            font-weight: bold;
+            display: block;
+            box-sizing: border-box;
+            padding: 0 10px 10px;
+            width: 100%;
+            resize: none;
+            border: none;
+            outline: none;
+        }
+        button {
+            background: #e3e3e3;
+            border-radius: 2px;
+            padding: 7px;
+            margin: 0 10px 10px;
+
+        }
+        .ny{
+            margin-top: 20px;
+            background: #FFF;
+        }
+
+        .comment{
+            padding: 10px;
+            border-top: 1px solid #e3e3e3;
+        }
+        .svar{
+            border-top: 1px solid #e3e3e3;
+        }
+
+
+    </style>
+
+    <script>
+        // layout and animations
+        window.onload = function(){
+            // style
+            $('#ny_diskotion_title').focus(function(){
+                $('#ny_diskotion_button_wrapper').slideDown();
+            }).blur( function(){
+                if($('#ny_diskotion_title').val()=="") {
+                    $('#ny_diskotion_button_wrapper').clearQueue().slideUp();
+
+                }
+            });
+            $('.diskotionholder').on("click", ".diskotion", function() {
+                if(!$(this).hasClass("out")) {
+                    load($(this).attr("data-id"));
+                    $(".out").removeClass("out").find('.svar').slideUp().parent().find("input, textarea").attr("readonly", "readonly").next("div").slideUp();
+
+                    $(this).addClass("out").find("input, textarea").removeAttr("readonly");
+                }
+            });
+
+        };
+        function addToLayout(data){
+            $(".diskotionholder").append('<div class="diskotion" data-id="'+data.id+'" > \n    <input type="text" class="ny_diskotion_title" placeholder="Title" value="'+data.title+'" readonly/>\n    \n   <div class="comments"></div> <div style="text-align: right; display: none">\n        <button onclick="slet('+data.id+')" class="material-element material-button material-ink material-ripple">Slet</button>   \n    </div>\n</div>')
+        }
+        function addComment(data, id) {
+            $("[data-id="+id+"] .comments").append("<div class='comment'>"+data.kommentar+"</div>");
+        }
+
+        // data
+        var diskotioner = new REST_list("api/discussion", {name: "diskotioner"}, function(data){
+            for (var i = 0; i < data.length; i++) {
+                addToLayout( data[i] );
+            }
+        });
+        var openTread = false;
+
+
+        function add(){
+            diskotioner.add({title: $('#ny_diskotion_title').val()}, function(data){
+                addToLayout(data);
+            });
+            $('#ny_diskotion_title').val('');
+        }
+        function slet(id){
+            diskotioner.delete(id);
+            $('[data-id='+id+']').slideUp()
+        }
+        function svar(id){
+            openTread.add({kommentar: $('[data-id='+id+'] .svarI').val()}, function(data) {
+                addComment(data, id);
+            });
+            $('[data-id=' + id + '] .svarI').val('');
+        }
+        function load(id) {
+            openTread = false;
+            openTread = diskotioner.REST_list(id, {}, function(data){
+                $("[data-id=" + id + "]").find('.comments').html('').show();
+                for (var i = 0; i < data.length; i++) {
+                    addComment( openTread.data[i], id );
+                }
+                $("[data-id="+id+"]").append("<div class='svar'><input type='text' class='svarI' placeholder='Svar'/><div><button onclick='svar("+id+")' >Svar</button> <button onclick='slet("+id+")'  style='text-align: right'>Fjern</button> </div></div>");
+
+            })
+        }
+
+    </script>
+</head>
+
+<body>
+
+<div class="diskotionouter">
+    <div class="diskotionholder">
+
+    </div>
+    <div class="nydiskotion" style="margin-top: 20px;">
+        <input type="text" id="ny_diskotion_title" placeholder="Title"/>
+        <div style="text-align: right; display: none; background: #ffffff" id="ny_diskotion_button_wrapper">
+            <button onclick="add()" >Add</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

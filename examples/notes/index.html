@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../requirements/bower_components/jquery/dist/jquery.js"></script>
+    <script src="../../dist/restflex.min.js"></script>
+
+
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            background: #f0f0f0;
+        }
+
+        .noteouter{
+            width: 700px;
+            margin: 100px auto;
+        }
+        .note{
+            box-shadow: 0 -1px 0 #e5e5e5,0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.24);
+            position: relative;
+            right: 0;
+            width: 700px;
+
+
+            transition: all .2s;
+        }
+        .note>div{
+            background: #ffffff;
+        }
+        .note.out{
+            margin: 10px 0;
+            width: 740px;
+            position: relative;
+            right: 20px;
+            box-shadow: 0 0 6px rgba(0,0,0,.16),0 6px 12px rgba(0,0,0,.32);
+        }
+
+
+
+        /*ny note*/
+        input{
+            font-size: 1.2em;
+        font-weight: bold;
+        display: block;
+        padding: 10px;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+        width: 100%;
+        }
+        textarea{
+            font-size: 1em;
+            font-weight: bold;
+            display: block;
+            box-sizing: border-box;
+            padding: 0 10px 10px;
+            width: 100%;
+            resize: none;
+            border: none;
+            outline: none;
+        }
+        button {
+            background: #e3e3e3;
+            border-radius: 2px;
+            padding: 7px;
+            margin: 0 10px 10px;
+
+        }
+        .nynote{
+            margin-top: 20px;
+            background: #FFF;
+        }
+
+
+
+    </style>
+
+    <script>
+        window.onload = function(){
+            // style
+            $('#ny_note_text, #ny_note_title').focus(function(){
+                $('#ny_note_button_wrapper').slideDown();
+            }).blur( function(){
+                if($('#ny_note_text').val()=="" && $('#ny_note_title').val()=="") {
+                    $('#ny_note_button_wrapper').clearQueue().slideUp();
+
+                }
+            });
+            $('.noteholder').on("click", ".note", function() {
+                if(!$(this).hasClass("out")) {
+                    $(".out").removeClass("out").find("input, textarea").attr("readonly", "readonly").next("div").slideUp();
+
+                    $(this).addClass("out").find("input, textarea").removeAttr("readonly").next("div").slideDown();
+                }
+            });
+
+        };
+
+
+
+        var noter = new REST_list("api/noter", {name: "index"}, function(data){
+            console.log(data);
+            for (var i = 0; i < data.length; i++) {
+                addToLayout( data[i] );
+            }
+        });
+
+
+
+        function add(){
+            var data = {title: $('#ny_note_title').val(), text: $('#ny_note_text').val()};
+            noter.add(data, function(data){
+                addToLayout(data);
+            })
+            $('#ny_note_title,#ny_note_text').val('')
+        }
+        function update(id){
+            noter.update(id, {title: $('[data-id='+id+'] input').val(), text: $('[data-id='+id+'] textarea').val()})
+        }
+        function slet(id){
+            noter.delete(id);
+            $('[data-id='+id+']').slideUp()
+        }
+
+
+
+        function addToLayout(data){
+            $(".noteholder").append('<div class="note" data-id="'+data.id+'" >\n    <input type="text" class="ny_note_title" placeholder="Title" value="'+data.title+'" readonly/>\n    <textarea class="ny_note_text" placeholder="Mere" readonly >'+data.text+'</textarea>\n    <div style="text-align: right; display: none">\n        <button onclick="slet('+data.id+')" >Slet</button>\n        <button onclick="update('+data.id+')">Update</button>\n    </div>\n</div>')
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="noteouter">
+    <div class="noteholder">
+
+    </div>
+    <div class="nynote material-z1">
+        <input type="text" id="ny_note_title" placeholder="Title"/>
+        <textarea id="ny_note_text" placeholder="Mere" ></textarea>
+        <div style="text-align: right; display: none" id="ny_note_button_wrapper">
+            <button onclick="add()">Add</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * Created by Bejamco on 12-01-2016.
+ * Created by Benjaco on 12-01-2016.
  */
 
 var REST_notifyer = {
@@ -38,17 +38,17 @@ var REST_notifyer = {
             this.funcDelete[name] = [func]
         }
     },
-    emitLoaded: function(name){
+    emitLoaded: function(name, data){
         if(this.funcLoaded[name]) {
             for(var i = 0; i<this.funcLoaded[name].length; i++){
-                this.funcLoaded[name][i]();
+                this.funcLoaded[name][i](data);
             }
         }
     },
-    emitUpdate: function(name, data){
+    emitUpdate: function(name, id, data){
         if(this.funcUpdate[name]) {
             for(var i = 0; i<this.funcUpdate[name].length; i++){
-                this.funcUpdate[name][i](data);
+                this.funcUpdate[name][i](id, data);
             }
         }
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../requirements/bower_components/jquery/dist/jquery.js"></script>
+    <script src="../../dist/restflex.min.js"></script>
+
+
+    <script>
+
+       /* REST_notifyer.onLoaded("var", function (data) {
+            alert(data)
+        })*/
+
+        var simpleVariable = new REST_variable("api/variabel", {name: "var"});
+
+        simpleVariable.onLoaded(function(data) {
+            document.getElementById("test").value = data;
+        });
+
+        function updateSV(){
+            simpleVariable.update(document.getElementById("test").value)
+        }
+    </script>
+</head>
+
+<body>
+
+<p>simple variabel</p>
+<input type="text" id="test"/> <button onclick="updateSV();">update</button>
+
+
+
+</body>
+</html>
