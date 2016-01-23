@@ -21,6 +21,7 @@ function REST_list(url, options, func){
         "successDeleteHeader": REST.defaults.successDeleteHeader,
         "successPutHeader": REST.defaults.successPutHeader,
         "converter": REST.defaults.list_converter,
+        "getParameter": {},
         "reGenarateIds": function(){
             object.id = [];
             for (var i = 0; i < object.data.length; i++) {
@@ -31,7 +32,7 @@ function REST_list(url, options, func){
         },
         "name": url,
         "get": function(func){
-            REST_ajax.get(url, function(data){
+            REST_ajax.get(url+"?"+REST_ajax.helpers.toQueryString(object.options.getParameter), function(data){
 
                 var dataC = object.options.converter(data);
 

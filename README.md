@@ -7,7 +7,6 @@ flexible rest javascript client
 license: MIT
 
 ##list
-
 init the list
 ```
 var list = new REST_list("api/yourList", {name: "myCostomListName"}, function(data){
@@ -39,7 +38,6 @@ list.get(function(data){
 
 
 ##single variables
-
 init the variable
 ```
 var variable = new REST_variable("api/variabel", {name: "var"});
@@ -79,7 +77,6 @@ onDelete - parameter: the deleted id
 
 
 ## options
-
 define success http code in following: readOnCreated, successGetHeader, successPostHeader, successDeleteHeader, successPutHeader
 
 defaults can be set in REST.defaults.readOnCreated ects.
@@ -96,7 +93,24 @@ converter: return the value from get request, default can be set
 
 only list:
 
+getParameter: set a object of get parameters to send when data retries from server
+
 list_converter: return object of items and id (key:id, valus:item index), defaults can be set 
+
+## http
+default status codes:
+
+successGetHeader: 200
+
+successPostHeader: 201
+
+successDeleteHeader: 204
+
+successPutHeader: 200
+
+
+put request uses a post request with a feild "_METHOD" set to "PUT", as well as "DELETE"
+
 
 
 ##other information
