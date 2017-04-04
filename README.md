@@ -1,4 +1,4 @@
-#RESTfelx
+# RESTfelx
 
 flexible rest javascript client
 
@@ -6,7 +6,7 @@ flexible rest javascript client
 
 license: MIT
 
-##list
+## list
 init the list
 ```
 var list = new REST_list("api/yourList", {name: "myCostomListName"}, function(data){
@@ -37,7 +37,7 @@ list.get(function(data){
 ```
 
 
-##single variables
+## single variables
 init the variable
 ```
 var variable = new REST_variable("api/variabel", {name: "var"});
@@ -51,7 +51,7 @@ variable.update("new value")
 
 add and delete isn´t callable as default
 
-##event listeners
+## event listeners
 works on both lists and variables
 
 ```
@@ -113,7 +113,7 @@ put request uses a post request with a feild "_METHOD" set to "PUT", as well as 
 
 
 
-##other information
+## other information
 all callback function are optional
 
 pull requests is welcome
